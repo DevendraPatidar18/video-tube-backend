@@ -1,0 +1,15 @@
+{
+  "name": "videotube",
+  "version": "1.0.0",
+  "description": "A video Streaming application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Devndra Patidar",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
