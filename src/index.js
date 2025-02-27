@@ -4,6 +4,8 @@ import express from"express";
 import {DB_NAME} from "./constants.js"
 import connectDB from "./database/connetctDB.js"
 
+const port = process.env.PORT || 3000;
+
 const app = express()
 await connectDB()
 
@@ -41,6 +43,6 @@ app.get('/twitter',(req,res) => {
     res.send("Devendra patidar")
 })
 
-app.listen(process.env.PORT, () => {
-    console.log(`App is listening on port ${process.env.PORT}`)
+app.listen(port, () => {
+    console.log(`App is listening on port ${port}`)
 } )
