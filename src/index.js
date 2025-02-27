@@ -5,7 +5,7 @@ import {DB_NAME} from "./constants.js"
 import connectDB from "./database/connetctDB.js"
 
 const app = express()
-connectDB()
+await connectDB()
 
 
 const userData = {
