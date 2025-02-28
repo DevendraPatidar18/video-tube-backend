@@ -2,8 +2,8 @@
 //dotenv.config({ path: '.env' });
 import 'dotenv/config';
 import express from"express";
-import {DB_NAME} from "./constants.js"
-import connectDB from "./database/connetctDB.js"
+import {DB_NAME} from "./src/constants.js"
+import connectDB from "./src/database/connetctDB.js"
 
 const port = process.env.PORT || 3000;
 
