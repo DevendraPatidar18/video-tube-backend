@@ -10,24 +10,27 @@ import fs from "fs"
 
 
     const uploadOnCloudnary = async (localFilePath) => {
-        if(!localFilePath) return console.log("Local File is Null")
-        // Upload an image
-        const uploadedFile = await cloudinary
-        .uploader
-        .upload(localFilePath,
-            {
-                resource_type: "auto"
-            }
-        )
-        //file has been uploaded successfuly
-        console.log("file is uploaded on cloudinary",uploadedFile.url)
-        return uploadedFile
-        
-        .catch((error) => {
-            //Remove the temparay uploaded file on the server
+        try {
+            if(!localFilePath) return console.log("Local File is Null")
+                // Upload an image
+                const uploadedFile = await cloudinary
+                .uploader
+                .upload(localFilePath,
+                    {
+                        resource_type: "auto"
+                    }
+                )
+                //file has been uploaded successfuly
+                console.log("file is uploaded on cloudinary",uploadedFile.url)
+                return uploadedFile
+            
+        } catch (error) {
             fs.unlinkSync(localFilePath) 
-           return null
-       });
+            return null
+        }
+        
+        
+        
     }
       
     export {uploadOnCloudnary}
