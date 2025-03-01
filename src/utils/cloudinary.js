@@ -22,6 +22,7 @@ import fs from "fs"
                 )
                 //file has been uploaded successfuly
                 console.log("file is uploaded on cloudinary",uploadedFile.url)
+                fs.readFileSync(localFilePath)
                 return uploadedFile
             
         } catch (error) {

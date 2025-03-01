@@ -17,5 +17,4 @@ userRouter.route("/register").post(
     ])
     ,registerUser
 )
-
 export {userRouter}

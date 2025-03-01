@@ -5,6 +5,7 @@ import { uploadOnCloudnary } from "../utils/cloudinary.js"
 import { HandleResponse } from "../utils/handle_response.js"
 
 
+
 const registerUser = asyncHandler(async (req, res) => {
     // get user detail form fontend 
     // validate user deatils
@@ -46,6 +47,8 @@ const registerUser = asyncHandler(async (req, res) => {
     if(!avatar){
         throw new HandleError(400,"Avatart file is required")
     }
+    
+    fs.unlinkSync(avatarLocalPath)
 
     const user = await User.create({
         fullName,
