@@ -48,7 +48,6 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new HandleError(400,"Avatart file is required")
     }
     
-    fs.unlinkSync(avatarLocalPath)
 
     const user = await User.create({
         fullName,

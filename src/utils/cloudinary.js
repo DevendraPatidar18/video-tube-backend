@@ -1,6 +1,7 @@
 import {v2 as cloudinary} from "cloudinary"
 import fs from "fs"
 
+
 // Configuration
     cloudinary.config({ 
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -22,7 +23,7 @@ import fs from "fs"
                 )
                 //file has been uploaded successfuly
                 console.log("file is uploaded on cloudinary",uploadedFile.url)
-                fs.readFileSync(localFilePath)
+        
                 return uploadedFile
             
         } catch (error) {
