@@ -35,7 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     
     const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.avatar[0]?.path
+    const coverImageLocalPath = req.files?.coverImage[0]?.path
 
     if(!avatarLocalPath){
         throw new HandleError(400,"Avatar is required")
