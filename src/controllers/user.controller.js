@@ -3,6 +3,25 @@ import { HandleError } from "../utils/handle_errors.js"
 import {User} from "../models/user.model.js"
 import { uploadOnCloudnary } from "../utils/cloudinary.js"
 import { HandleResponse } from "../utils/handle_response.js"
+import jwt from "jsonwebtoken"
+
+
+const generateAccessAndRefereshToken = async(userId)=>{
+    
+    try {
+        const user = await User.findById(userId)  
+        const accessToken =  user.generateAccessToken()
+        const refreshToken =  user.generateRefreshToken()
+
+        user.refreshToken = refreshToken
+        user.save({validateBeforeSave: false})
+
+        return {accessToken ,refreshToken}
+        
+    } catch (error) {
+        throw new HandleError(500,"token generation faild")
+    }
+}
 
 
 
@@ -71,4 +90,136 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 })
 
-export {registerUser}
+const loginUser = asyncHandler(async (req, res,) => {
+    // get users deatail
+    // find user by username or email
+    // check password
+    // generate access and refresh token
+    // send tokens to user 
+
+    const {username, email, password}  = req.body
+
+    if(!(username || email )){
+        throw new HandleError(400, "username or email is required")
+    }
+
+    const user = await User.findOne({
+        $or: [{username},{email}]
+    })
+
+    if(!user){
+        throw new HandleError(400,"user does not exist")
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password)
+
+    if(!isPasswordValid){
+        throw new HandleError(401, "Invalid Password")
+    }
+
+    const {accessToken,refreshToken} = await generateAccessAndRefereshToken(user._id)
+
+    const loggedInUser  =  await User.findById(user._id).
+    select("-password -refreshToken")
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res.
+    status(200).
+    cookie("accessToken", accessToken, options).
+    cookie("refreshToken", refreshToken, options).
+    json(
+        new HandleResponse(
+            200,
+            {
+                user: loggedInUser, accessToken, refreshToken
+            },
+            "user logged in successfully"
+        )
+    )
+})
+
+const logoutUser = asyncHandler(async (req, res) => {
+    User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken",options)
+    .clearCookie("refreshToken",options)
+    .json(new HandleResponse(200, {},"User logged out"))
+})
+
+const refreshAccessToken = asyncHandler( async (req, res) => {
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+
+    if(!incomingRefreshToken){
+        throw new HandleError(401, "Refresh token is required")
+    }
+
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        )
+    
+        const user = await User.findById(decodedToken?._id)
+    
+        if(!user){
+            throw new HandleError(401, "Invalid token")
+        }
+    
+        if(incomingRefreshToken !== user?.refreshToken){
+            throw new HandleError(401, "refresh token is expired or used")
+        }
+    
+        const options = {
+            httpOnly: true,
+            secure:true
+        }
+    
+        const {accessToken, newRefreshToken} = await generateAccessAndRefereshToken(user._id)
+    
+        return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", newRefreshToken, options)
+        .json(
+            new HandleResponse(
+                200,
+                {
+                    accessToken: accessToken,
+                    refreshToken: newRefreshToken
+                },
+                "access token refreshed"
+    
+            )
+        )
+    } catch (error) {
+        throw new HandleError(401, error?.message || "invalid refresh token");
+        
+    }
+})
+export {
+    registerUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken
+}
