@@ -115,7 +115,7 @@ const loginUser = asyncHandler(async (req, res,) => {
 
     if(!user){
         //throw new HandleError(400,"user does not exist")
-        return res.status(400).json(new HandleError(400,{},"user does not required"))
+        return res.status(400).json(new HandleError(400,{},"user does not exist"))
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password)
