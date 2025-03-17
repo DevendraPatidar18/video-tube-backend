@@ -105,7 +105,8 @@ const loginUser = asyncHandler(async (req, res,) => {
     const {username, email, password}  = req.body
 
     if(!(username || email )){
-        throw new HandleError(400, "username or email is required")
+        //throw new HandleError(400, "username or email is required")
+        return res.status(400).json(new HandleError(400,{},"username or email is required"))
     }
 
     const user = await User.findOne({
@@ -113,14 +114,15 @@ const loginUser = asyncHandler(async (req, res,) => {
     })
 
     if(!user){
-        throw new HandleError(400,"user does not exist")
+        //throw new HandleError(400,"user does not exist")
+        return res.status(400).json(new HandleError(400,{},"user does not required"))
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password)
 
     if(!isPasswordValid){
         //throw new HandleError(401, "Invalid Password")
-        return res.status(200).json(new HandleError(401,{},"Invalid password"))
+        return res.status(401).json(new HandleError(401,{},"Invalid password"))
     }
 
     const {accessToken,refreshToken} = await generateAccessAndRefereshToken(user._id)
