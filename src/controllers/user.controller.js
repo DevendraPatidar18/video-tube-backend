@@ -120,7 +120,7 @@ const loginUser = asyncHandler(async (req, res,) => {
 
     if(!isPasswordValid){
         //throw new HandleError(401, "Invalid Password")
-        return res.status(200).json(new HandleError(401,"Invalid password"))
+        return res.status(200).json(new HandleError(401,{},"Invalid password"))
     }
 
     const {accessToken,refreshToken} = await generateAccessAndRefereshToken(user._id)
