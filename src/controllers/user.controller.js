@@ -41,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     if([fullName, email, username,password].some((field)  => field?.trim === ""))
     {
-        throw new HandleError(400, "All field are required")
+        return res.status(400).json(new HandleError(400,{},"All field are required"))
     }
 
     const existedUser = await User.findOne(
@@ -50,11 +50,12 @@ const registerUser = asyncHandler(async (req, res) => {
         }
     )
     if(existedUser) {
-        throw new HandleError(409, "User with email or username already exist")
+        return res.status(409).json(new HandleError(400,{},"User with email or username already exist"))
+        
     }
     
-    const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    const avatarLocalPath = req.files?.avatar?.[0]?.path || null
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path || null
     console.log(avatarLocalPath);
     console.log(coverImageLocalPath);
     
@@ -62,14 +63,19 @@ const registerUser = asyncHandler(async (req, res) => {
     
 
     if(!avatarLocalPath){
-        throw new HandleError(400,"Avatar is required")
+        return res.status(400).json( new HandleError(400,{},"Avatar is required"))
     }
-
+    let coverImage = null;
     const avatar = await uploadOnCloudnary(avatarLocalPath)
-    const coverImage = await uploadOnCloudnary(coverImageLocalPath)
+    if(coverImageLocalPath){
+        const coverImage = await uploadOnCloudnary(coverImageLocalPath)
+    }
+    
+    
+    
 
     if(!avatar){
-        throw new HandleError(400,"Avatart file is required")
+        return res.status(400).json(new HandleError(400,{},"Avatar file is required"))
     }
     
 
@@ -87,7 +93,7 @@ const registerUser = asyncHandler(async (req, res) => {
     )
 
     if(!createdUser){
-        throw new HandleError(500,"Somthing went wrong while registering user")
+        return res.status(500).json(new HandleError(500,{},"Somthing went wrong while registering user"))
     }
 
     return res.status(201).json(
