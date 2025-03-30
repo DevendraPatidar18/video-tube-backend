@@ -12,6 +12,8 @@ const generateAccessAndRefereshToken = async(userId)=>{
         const user = await User.findById(userId)  
         const accessToken =  user.generateAccessToken()
         const refreshToken =  user.generateRefreshToken()
+        console.log(`refreshToken ${refreshToken}`);
+        
 
         user.refreshToken = refreshToken
         user.save({validateBeforeSave: false})
@@ -209,18 +211,22 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
             secure:true
         }
     
-        const {accessToken, newRefreshToken} = await generateAccessAndRefereshToken(user._id)
+        const {accessToken, refreshToken} = await generateAccessAndRefereshToken(user._id)
+        console.log(accessToken);
+        console.log(refreshToken);
+        
+        
     
         return res
         .status(200)
         .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", newRefreshToken, options)
+        .cookie("refreshToken", refreshToken, options)
         .json(
             new HandleResponse(
                 200,
                 {
                     accessToken: accessToken,
-                    refreshToken: newRefreshToken
+                    refreshToken: refreshToken
                 },
                 "access token refreshed"
     
@@ -231,9 +237,36 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
         
     }
 })
+
+const getUser = asyncHandler( async (req, res) => {
+    //get user from middleware
+    const user = await User.findById(req.user._id)
+
+    if(!user){
+        return res.status(401).json(new HandleError(401,{},"invalid Token"));
+    }
+    
+    const userData = await User.findById(user._id).select(
+        "-password -refreshToken -__v"
+    )
+
+    if(!userData){
+        return res.status(500).json( new HandleError(500,{},"Somthing went wrong while geting user data"))
+    }
+
+    return res.status(200).json( 
+        new HandleResponse(
+            200,
+            userData,
+            "user Fatched successfully"
+
+        )
+    )
+})
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    getUser
 }
