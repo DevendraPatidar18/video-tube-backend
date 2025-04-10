@@ -18,7 +18,8 @@ import fs from "fs"
                 .uploader
                 .upload(localFilePath,
                     {
-                        resource_type: "auto"
+                        resource_type: "auto",
+                        media_metadata: true,
                     }
                 )
                 //file has been uploaded successfuly
