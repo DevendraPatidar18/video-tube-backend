@@ -18,6 +18,9 @@ app.use(cookieParser())
  import {userRouter} from "./routes/user.routes.js"
 import { videoRouter } from "./routes/video.routes.js";
 
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
  //router declaration
  app.use("/api/v1/users",userRouter)
