@@ -7,9 +7,9 @@ import { HandleResponse } from "../utils/handle_response.js";
 
 
 const uploadVideo = asyncHandler(async (req, res) => {
-    const {title, description, duration,views} = req.body
+    const {title, description,views,thumbnail,video,duration} = req.body
 
-    if([title, description,].some((field)  => field?.trim === ""))
+    if([title, description,thumbnail,video,duration].some((field)  => field?.trim === ""))
         {
             return res.status(400).json(new HandleError(400,{},"All field are required"))
         }
@@ -23,33 +23,13 @@ const uploadVideo = asyncHandler(async (req, res) => {
             "-password -__v,"
         )
         
-        const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path || null
-        const videoLocalPath = req.files?.video?.[0]?.path || null
-        const d  = req.files?.video?.[0]?.duration
-
-        if(!thumbnailLocalPath){
-            return res.status(400).json( new HandleError(400,{},"thumbnail is required"))
-        }
-        if(!videoLocalPath){
-            return res.status(400).json( new HandleError(400,{},"video file is required"))
-        }
-
-        const thumbnail = await uploadOnCloudnary(thumbnailLocalPath);
-        const video = await uploadOnCloudnary(videoLocalPath);
-        const videoDuration = video.duration;
-        if(!thumbnail){
-            return res.status(500).json(new HandleError(500,{},"Error while uploading thumbnail"))
-        }
-        if(!video){
-            return res.status(500).json(new HandleError(500,{},"Video upload fiald"))
-        }
         const uploadedVideo = await Video.create({
             title: title,
             description: description,
-            thumbnail: thumbnail.url,
-            videoFile: video.url,
+            thumbnail: thumbnail,
+            videoFile: video,
             views,
-            duration: videoDuration,
+            duration: duration,
             owner: owner,
         })
 
