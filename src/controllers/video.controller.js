@@ -70,6 +70,7 @@ const getVideos = asyncHandler(async (req, res) => {
                     videoFile : 1,
                     views : 1,
                     owner : 1,
+                    createdAt : 1,
                     "ownerData._id" : 1,
                     "ownerData._name" : 1,
                     "ownerData.username" : 1,
