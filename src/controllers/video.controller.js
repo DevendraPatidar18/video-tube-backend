@@ -66,6 +66,7 @@ const getVideos = asyncHandler(async (req, res) => {
                     id_ : 1,
                     title : 1,
                     thumbnail : 1,
+                    description : 1,
                     videoFile : 1,
                     views : 1,
                     owner : 1,
