@@ -43,15 +43,15 @@ const getVideos = asyncHandler(async (req, res) => {
     try {
         const lastId = req.query.lastId;
         const limit = 10;
+        let hasMore = false;
         //const query = lastId?{_id:{ $gt: new ObjectId}}
 
         const videos = await Video.aggregate([
             ...(lastId ? [{ $match: { _id: { $gt: new mongoose.Types.ObjectId(lastId) } } }]
                 : []),
             // Sort and limit
-            { $sort: { _id: 1 } },
-            { $limit: 10 },
-
+            { $sort: { _id: -1 } },
+            { $limit: limit + 1 },
             // Lookup user data from `users` collection
             {
                 $lookup: {
@@ -82,11 +82,14 @@ const getVideos = asyncHandler(async (req, res) => {
             // Unwind the array to make it a single object
             { $unwind: '$ownerData' }
         ])
+        if(videos.length > limit){
+            hasMore = true;
+            videos.pop();
+        }
 
-
-        res.json(videos);
+        res.status(200).json(new HandleResponse(200,{videos,hasMore}));
     } catch (e) {
-        res.status(500).json({ "error": e.message })
+        res.status(500).json(new HandleError(500,{},"video fatching faild"))
     }
 });
 
