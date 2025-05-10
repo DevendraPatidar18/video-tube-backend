@@ -96,7 +96,39 @@ const getVideos = asyncHandler(async (req, res) => {
     }
 });
 
+const search =  asyncHandler(async (req,res) => {
+    const searchQuery = req.query.search;
+    const searchResult =  await Video.aggregate([
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'ownerData'
+            }
+        },
+        { $unwind: '$ownerData' },
+        {
+            $match: {
+            $or: [
+              { title: { $regex: searchQuery, $options: "i" } },
+              { "ownerData.username": { $regex: searchQuery, $options: "i" } }
+            ]
+          },
+        },
+        {
+            $project: {
+              title: 1,
+              channelName: "$ownerData.username"
+            }
+          }
+    ])
+    return res.status(200).json(new HandleResponse(200,searchResult));
+});
+
+
 export {
     uploadVideo,
-    getVideos
+    getVideos,
+    search,
 }
