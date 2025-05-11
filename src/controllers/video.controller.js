@@ -98,6 +98,9 @@ const getVideos = asyncHandler(async (req, res) => {
 
 const search =  asyncHandler(async (req,res) => {
     const searchQuery = req.query.search;
+    if(!searchQuery){
+        res.status(404).json(new HandleError(404,{},"Query is null"));
+    }
     const searchResult =  await Video.aggregate([
         {
             $lookup: {
@@ -118,7 +121,7 @@ const search =  asyncHandler(async (req,res) => {
         },
         {
             $project: {
-              id_ : 1,
+                    id_ : 1,
                     title : 1,
                     thumbnail : 1,
                     description : 1,
