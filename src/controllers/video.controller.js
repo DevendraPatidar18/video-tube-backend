@@ -118,8 +118,19 @@ const search =  asyncHandler(async (req,res) => {
         },
         {
             $project: {
-              title: 1,
-              channelName: "$ownerData.username"
+              id_ : 1,
+                    title : 1,
+                    thumbnail : 1,
+                    description : 1,
+                    videoFile : 1,
+                    views : 1,
+                    owner : 1,
+                    createdAt : 1,
+                    "ownerData._id" : 1,
+                    "ownerData.name" : 1,
+                    "ownerData.username" : 1,
+                    "ownerData.avatar" : 1,
+                    "ownerData.subscribers" :1
             }
           }
     ])
